@@ -27,12 +27,13 @@
 
 #include "TexturedTeapotRender.h"
 #include "NDKHelper.h"
+#include <play/app_update.h>
 
 //-------------------------------------------------------------------------
 // Preprocessor
 //-------------------------------------------------------------------------
 #define HELPER_CLASS_NAME \
-  "com/google/android/samples/playassetdeliverynative/helper/NDKHelper"  // Class name of helper function
+  "com/shenshen/gamepad/teapot/helper/NDKHelper"  // Class name of helper function
 //-------------------------------------------------------------------------
 // Shared state for our app.
 //-------------------------------------------------------------------------
@@ -66,6 +67,8 @@ class Engine {
  public:
   static void HandleCmd(struct android_app *app, int32_t cmd);
   static int32_t HandleInput(android_app *app, AInputEvent *event);
+  static void OnResume(ANativeActivity* activity);
+  static void OnPause(ANativeActivity* activity);
 
   Engine();
   ~Engine();
@@ -372,6 +375,14 @@ void Engine::ShowUI() {
   return;
 }
 
+void Engine::OnResume(ANativeActivity* activity) {
+    AppUpdateManager_onResume();
+}
+
+void Engine::OnPause(ANativeActivity* activity) {
+    AppUpdateManager_onPause();
+}
+
 Engine g_engine;
 
 /**
@@ -389,6 +400,8 @@ void android_main(android_app *state) {
   state->userData = &g_engine;
   state->onAppCmd = Engine::HandleCmd;
   state->onInputEvent = Engine::HandleInput;
+  //state->activity->callbacks->onResume = Engine::OnResume;
+  //state->activity->callbacks->onPause = Engine::OnPause;
 
 #ifdef USE_NDK_PROFILER
   monstartup("libTeapotNativeActivity.so");
@@ -400,7 +413,11 @@ void android_main(android_app *state) {
   InitAssetManager(state);
   SelectAssetPack(state, "on_demand_pack");
 
+  InitIAUManager(state);
+  AppUpdateInfo* IAUinfo = nullptr;
   // loop waiting for stuff to do.
+  bool startedIAU = false;
+  int step = 0;
   while (1) {
     // Read all pending events.
     int id;
@@ -426,9 +443,37 @@ void android_main(android_app *state) {
     }
 
     if (g_engine.IsReady()) {
-      // Drawing is throttled to the screen update rate, so there
-      // is no need to do timing here.
-      g_engine.DrawFrame();
+        g_engine.DrawFrame();
+    }
+    step ++;
+    if(step == 120) {
+        IAUinfo = IAUGetInfo(state);
+        step = 0;
+    }
+
+    if(IAUinfo != nullptr) {
+        uint32_t version_code = AppUpdateInfo_getAvailableVersionCode(IAUinfo);
+        AppUpdateAvailability availability = AppUpdateInfo_getAvailability(IAUinfo);
+        AppUpdateStatus status = AppUpdateInfo_getStatus(IAUinfo);
+        int32_t staleness_days = AppUpdateInfo_getClientVersionStalenessDays(IAUinfo);
+        int32_t priority = AppUpdateInfo_getPriority(IAUinfo);
+        uint64_t bytes_downloaded = AppUpdateInfo_getBytesDownloaded(IAUinfo);
+        uint64_t bytes_to_download = AppUpdateInfo_getTotalBytesToDownload(IAUinfo);
+
+        char log[1000] = "";
+        sprintf(log, "version_code=%d, availability=%d, status=%d, staleness_days=%d, priority=%d, bytes_downloaded=%lu, bytes_to_download=%lu",
+                version_code, availability, status, staleness_days, priority, (unsigned long)bytes_downloaded, (unsigned long)bytes_to_download);
+        LogInfo(state, log);
+
+        if(availability == APP_UPDATE_AVAILABLE && !startedIAU) {
+            StartFlexibleIAU(state, IAUinfo);
+            startedIAU = true;
+        }
+
+
+        if(status == APP_UPDATE_DOWNLOADED) {
+            CompleteIAU(state);
+        }
     }
   }
 }

@@ -25,7 +25,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Werror -fno-exceptions
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
 
 
-get_filename_component(PLAY_CORE_NATIVE_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../play-core-native-sdk ABSOLUTE)
+get_filename_component(PLAY_CORE_NATIVE_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../play-core-native-sdk ABSOLUTE)
 include(${PLAY_CORE_NATIVE_SDK_DIR}/playcore.cmake)
 add_playcore_static_library()
 

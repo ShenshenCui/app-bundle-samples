@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.samples.playassetdeliverynative.helper;
+package com.shenshen.gamepad.teapot.helper;
 
 import android.annotation.TargetApi;
 import android.app.NativeActivity;

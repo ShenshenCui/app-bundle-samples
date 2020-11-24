@@ -15,7 +15,7 @@
  -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.google.android.samples.playassetdeliverynative">
+          package="com.shenshen.gamepad.teapot">
 
   <uses-feature android:glEsVersion="0x00020000"/>
 
@@ -26,12 +26,12 @@
       android:icon="@mipmap/ic_launcher"
       android:label="@string/app_name"
       android:theme="@style/AppTheme"
-      android:name="com.google.android.samples.playassetdeliverynative.TeapotApplication"
+      android:name="com.shenshen.gamepad.teapot.TeapotApplication"
       >
 
     <!-- Our activity is the built-in NativeActivity framework class.
          This will take care of integrating with our NDK code. -->
-    <activity android:name="com.google.android.samples.playassetdeliverynative.TeapotNativeActivity"
+    <activity android:name="com.shenshen.gamepad.teapot.TeapotNativeActivity"
               android:label="@string/app_name"
               android:configChanges="orientation|keyboardHidden">
       <!-- Tell NativeActivity the name of our .so -->

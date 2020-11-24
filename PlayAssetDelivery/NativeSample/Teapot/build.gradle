@@ -18,17 +18,17 @@
 apply plugin: 'com.android.application'
 
 // Wrap the relative path with file() since CMake requires an absolute path.
-def PLAY_CORE_NATIVE_SDK_DIR = file('../play-core-native-sdk')
+def PLAY_CORE_NATIVE_SDK_DIR = file('../../play-core-native-sdk')
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
-        applicationId = 'com.google.android.samples.playassetdeliverynative'
-        minSdkVersion 16
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0.0"
+        applicationId = 'com.shenshen.gamepad.teapot'
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 78
+        versionName "1.0.78"
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
@@ -52,6 +52,12 @@ android {
     externalNativeBuild {
         cmake {
             path 'src/main/cpp/CMakeLists.txt'
+        }
+    }
+
+    bundle {
+        texture {
+            enableSplit true
         }
     }
 

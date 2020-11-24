@@ -235,3 +235,65 @@ void ShowCellularDataConfirmation(struct android_app *app) {
           error_code2);
   LogInfo(app, log);
 }
+
+void InitIAUManager(struct android_app *app) {
+    AppUpdateErrorCode error_code = AppUpdateManager_init(app->activity->vm, app->activity->clazz);
+    if (error_code != APP_UPDATE_NO_ERROR) {
+        char log[100] = "";
+        sprintf(log, "Fail to init In App Update Manager, error_code=%d", error_code);
+        LogInfo(app, log);
+
+        return;
+    }
+
+    error_code = AppUpdateManager_requestAppUpdateInfo();
+    if (error_code != APP_UPDATE_NO_ERROR) {
+        char log[100] = "";
+        sprintf(log, "Fail to request IAU Info, error_code=%d", error_code);
+        LogInfo(app, log);
+        return;
+    }
+}
+
+AppUpdateInfo* IAUGetInfo(struct android_app *app) {
+    AppUpdateInfo* info;
+    AppUpdateErrorCode error_code = AppUpdateManager_getAppUpdateInfo(&info);
+    if (error_code != APP_UPDATE_NO_ERROR) {
+        char log[100] = "";
+        sprintf(log, "Fail to get IAU Info, error_code=%d", error_code);
+        LogInfo(app, log);
+        return nullptr;
+    }
+    return info;
+}
+
+void StartFlexibleIAU(struct android_app *app, AppUpdateInfo* info) {
+    AppUpdateOptions* flex_options;
+    AppUpdateOptions_createOptions(APP_UPDATE_TYPE_FLEXIBLE, &flex_options);
+    if (AppUpdateInfo_getIsUpdateTypeAllowed(info, flex_options)) {
+        AppUpdateManager_requestUpdateFlow(info, flex_options, app->activity->clazz);
+    }
+
+
+}
+
+void StartImmediateIAU(struct android_app *app, AppUpdateInfo* info) {
+    AppUpdateOptions* immediate_options;
+    AppUpdateOptions_createOptions(APP_UPDATE_TYPE_IMMEDIATE, &immediate_options);
+    if (AppUpdateInfo_getIsUpdateTypeAllowed(info, immediate_options)) {
+        AppUpdateOptions_setAllowAssetPackDeletion(immediate_options, true);
+        AppUpdateManager_requestUpdateFlow(info, immediate_options, app->activity->clazz);
+    }
+}
+
+void CompleteIAU(struct android_app *app) {
+    AppUpdateErrorCode error_code = AppUpdateManager_requestCompleteUpdate();
+    if (error_code != APP_UPDATE_NO_ERROR)
+    {
+        char log[100] = "";
+        sprintf(log, "Fail to complete IAU Info, error_code=%d", error_code);
+        LogInfo(app, log);
+        return;
+    }
+}
+

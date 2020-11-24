@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.samples.playassetdeliverynative;
+package com.shenshen.gamepad.teapot;
 
 import android.app.Application;
 import android.util.Log;

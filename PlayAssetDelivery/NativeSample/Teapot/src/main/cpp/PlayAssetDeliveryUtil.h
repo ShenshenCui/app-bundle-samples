@@ -22,6 +22,9 @@
 #include <android_native_app_glue.h>
 #include <android/asset_manager.h>
 #include <play/asset_pack.h>
+#include <play/app_update.h>
+
+void LogInfo(struct android_app *app, const char *str);
 
 uint8_t *AssetReadTextureFile(AAssetManager *assetManager,
                               std::string &assetName, std::string &packName, bool isUnderApk,
@@ -41,5 +44,11 @@ AssetPackDownloadStatus GetDownloadState();
 AssetPackDownloadStatus PrintDownloadState(struct android_app *app);
 void ShowCellularDataConfirmation(struct android_app *app);
 void LogHeader(struct android_app *app, const char *str);
+
+void InitIAUManager(struct android_app *app);
+AppUpdateInfo* IAUGetInfo(struct android_app *app);
+void StartFlexibleIAU(struct android_app *app, AppUpdateInfo* info);
+void StartImmediateIAU(struct android_app *app, AppUpdateInfo* info);
+void CompleteIAU(struct android_app *app);
 
 #endif // __ASSET__UTIL_H__
